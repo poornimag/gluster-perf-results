@@ -4,28 +4,30 @@ import os
 import numpy as np
 import csv
 import json
+import argparse
 
 def parse_smallfile(base_dir, result_dir):
     result_fmt = {
             "smallfile-dir-ops.csv" : [ 'create', 'delete', 'rename', 'mkdir', 'rmdir', 'symlink', 'delete-renamed', 'readdir', 'ls-l' ],
-            "smallfile-file-ops.csv" : [ 'append', 'overwrite', 'setxattr', 'chmod', 'read', 'stat', 'getxattr' ]
+            "smallfile-file-ops.csv" : [ 'append', 'overwrite', 'setxattr', 'chmod', 'read', 'stat' ]
     }
-    smallfile_dir = path.join(base_dir, result_dir, "smallfile")
+    smallfile_dir = os.path.join(base_dir, result_dir, 'smallfile')
     for csv_file in result_fmt:
         res_csv = result_dir
         for ops in result_fmt[csv_file]:
-            with open("%s/%s" % (smallfile_dir, dir_op)) as f:
+            with open("%s/%s" % (smallfile_dir, ops)) as f:
                 data = json.load(f)
-                res_csv = res_csv + "," + data['results']['files-per-sec']
-        with open("%s/%s" % (base_dir/csv_file), "a+") as f:
+		print smallfile_dir + ops
+                res_csv = res_csv + "," + str(data['results']['files-per-sec'])
+        with open("%s/%s" % (base_dir, csv_file), "a+") as f:
             f.write(res_csv + '\n')
 
 def parse_fio(base_dir, result_dir):
     result_fmt = {
-            "read-write.csv" : [ 'read', 'randread', 'write', 'randwrite' ]
+            "read-write.csv" : [ 'SeqRead', 'RandomRead', 'SeqWrite', 'RandomWrite' ]
     }
 
-    fio_dir = path.join(base_dir, result_dir, "fio")
+    fio_dir = os.path.join(base_dir, result_dir, 'fio')
     for csv_file in result_fmt:
         res_csv = result_dir
         for res in result_fmt[csv_file]:
@@ -40,7 +42,7 @@ def parse_pgbench(base_dir, result_dir):
             "pgbench-scale.csv" : ["scale.json"],
             "pgbench-transactions.csv" : ["transactions.json"]
     }
-    pgbench_dir = path.join(base_dir, result_dir, "pgbench")
+    pgbench_dir = os.path.join(base_dir, result_dir, 'pgbench')
     for csv_file in result_fmt:
         res_csv = result_dir
         for res in result_fmt[csv_file]:
@@ -57,7 +59,7 @@ def parse_untar(base_dir, result_dir):
     result_fmt = {
             "untar.csv" : ["untar.json", "untar-rm-rf.json"]
     }
-    untar_dir = path.join(base_dir, result_dir, "untar")
+    untar_dir = os.path.join(base_dir, result_dir, 'untar')
     for csv_file in result_fmt:
         res_csv = result_dir
         for res in result_fmt[csv_file]:
@@ -74,7 +76,7 @@ def parse_result_dir_add_csv(base_dir, result_dir):
     parse_untar(base_dir, result_dir)
 
 def main(base_dir, result_dir):
-    parse_base_dir() #optional only if all
+    #parse_base_dir() #optional only if all
     parse_result_dir_add_csv(base_dir, result_dir)
 
 if __name__ == "__main__":
